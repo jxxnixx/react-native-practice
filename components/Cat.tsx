@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { SectionList, Text, TextInput, View, FlatList } from 'react-native';
+import {
+  SectionList,
+  Text,
+  TextInput,
+  View,
+  FlatList,
+  Platform,
+} from 'react-native';
 import { StyleSheet } from 'react-native';
 
 const Cat = () => {
@@ -12,6 +19,17 @@ const Cat = () => {
       flex: 1,
       padding: 20,
       gap: 10,
+      ...Platform.select({
+        ios: {
+          backgroundColor: 'aliceblue',
+        },
+        android: {
+          backgroundColor: 'ivory',
+        },
+        default: {
+          backgroundColor: 'lavender',
+        },
+      }),
     },
     title: {
       fontSize: 24,
@@ -22,14 +40,14 @@ const Cat = () => {
       padding: 8,
       fontSize: 16,
       fontWeight: 'bold',
-      backgroundColor: 'lightgray',
+      backgroundColor: Platform.OS === 'ios' ? 'skyblue' : 'mediumpurple',
     },
     input: {
       padding: 10,
       fontSize: 16,
       height: 40,
       borderWidth: 1,
-      borderColor: 'gray',
+      borderColor: Platform.OS === 'ios' ? 'skyblue' : 'mediumpurple',
       borderRadius: 5,
     },
     item: {
