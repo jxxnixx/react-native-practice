@@ -24,6 +24,8 @@ const rectangleImages = {
 } as const;
 
 const SquareBox = ({ num, text }: { num: 1 | 2 | 3; text?: string }) => {
+  const realText = text ? text : `F1 S${num}`;
+
   return (
     <View style={styles.imagebox1}>
       <ImageBackground
@@ -31,7 +33,7 @@ const SquareBox = ({ num, text }: { num: 1 | 2 | 3; text?: string }) => {
         style={styles.image}
         imageStyle={styles.imageStyle}
       >
-        <Text style={styles.boxText}>{text}</Text>
+        <Text style={styles.boxText}>{realText}</Text>
       </ImageBackground>
     </View>
   );
@@ -47,6 +49,9 @@ const RectangleBox = ({
   text?: string;
 }) => {
   const imageBoxStyles = ratio === 2 ? styles.imagebox2 : styles.imagebox3;
+
+  const realText = text ? text : `F${ratio} R${num}`;
+
   return (
     <View style={imageBoxStyles}>
       <ImageBackground
@@ -54,7 +59,7 @@ const RectangleBox = ({
         style={styles.image}
         imageStyle={styles.imageStyle}
       >
-        <Text style={styles.boxText}>{text}</Text>
+        <Text style={styles.boxText}>{realText}</Text>
       </ImageBackground>
     </View>
   );
@@ -69,46 +74,56 @@ const ImageBox = () => {
     >
       {/* 첫 번째 Row */}
       <View style={styles.rowContainer}>
-        <SquareBox num={1} text="F1 S1" />
-        <SquareBox num={2} text="F1 S2" />
-        <SquareBox num={3} text="F1 S3" />
-        <SquareBox num={1} text="F1 S1" />
-        <SquareBox num={2} text="F1 S2" />
-        <SquareBox num={3} text="F1 S3" />
-        <SquareBox num={1} text="F1 S1" />
-        <SquareBox num={2} text="F1 S2" />
-        <SquareBox num={3} text="F1 S3" />
-        <SquareBox num={1} text="F1 S1" />
-        <SquareBox num={2} text="F1 S2" />
-        <SquareBox num={3} text="F1 S3" />
+        <SquareBox num={1} />
+        <SquareBox num={2} />
+        <SquareBox num={3} />
+        <SquareBox num={1} />
+        <SquareBox num={2} />
+        <SquareBox num={3} />
+        <SquareBox num={1} />
+        <SquareBox num={2} />
+        <SquareBox num={3} />
+        <SquareBox num={1} />
+        <SquareBox num={2} />
+        <SquareBox num={3} />
       </View>
 
       {/* 두 번째 Row */}
       <View style={styles.rowContainer}>
-        <SquareBox num={3} text="F1 S3" />
-        <RectangleBox ratio={2} num={1} text="F2 R1" />
-        <SquareBox num={2} text="F1 S2" />
-        <RectangleBox ratio={2} num={2} text="F2 R2" />
+        <SquareBox num={3} />
+        <RectangleBox ratio={2} num={1} />
+        <SquareBox num={2} />
+        <RectangleBox ratio={2} num={2} />
       </View>
 
       {/* 세 번째 Row */}
       <View style={styles.rowContainer}>
-        <RectangleBox ratio={2} num={2} text="F2 R2" />
-        <SquareBox num={2} text="F1 S2" />
-        <RectangleBox ratio={3} num={5} text="F3 R5" />
-        <RectangleBox ratio={2} num={3} text="F2 R3" />
+        <RectangleBox ratio={2} num={2} />
+        <SquareBox num={2} />
+        <RectangleBox ratio={3} num={5} />
+        <RectangleBox ratio={2} num={3} />
       </View>
 
       {/* 네 번째 Row */}
       <View style={styles.rowContainer}>
-        <SquareBox num={2} text="F1 S2" />
-        <SquareBox num={3} text="F1 S3" />
-        <SquareBox num={2} text="F1 S2" />
-        <RectangleBox ratio={3} num={5} text="F3 R5" />
+        <RectangleBox ratio={3} num={6} />
+        <SquareBox num={2} />
+        <SquareBox num={1} />
+        <SquareBox num={3} />
+      </View>
+
+      {/* 다섯 번째 Row */}
+      <View style={styles.rowContainer}>
+        <RectangleBox ratio={2} num={1} />
+        <RectangleBox ratio={3} num={5} />
+        <RectangleBox ratio={2} num={1} />
+        <RectangleBox ratio={3} num={5} />
       </View>
     </ScrollView>
   );
 };
+
+const isWeb = Platform.OS === 'web';
 
 const styles = StyleSheet.create({
   scrollView: {
@@ -124,36 +139,36 @@ const styles = StyleSheet.create({
     borderColor: 'lightgray',
   },
   rowContainer: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 5,
-    minHeight: Platform.OS === 'web' ? 200 : 50,
   },
   imagebox1: {
     flex: 1,
-    marginHorizontal: 5, // 요소 간의 간격 조절
+    marginHorizontal: isWeb ? 5 : 2,
   },
   imagebox2: {
     flex: 2,
-    marginHorizontal: 5,
+    marginHorizontal: isWeb ? 5 : 2,
   },
   imagebox3: {
     flex: 3,
-    marginHorizontal: 5,
+    marginHorizontal: isWeb ? 5 : 2,
   },
   image: {
     width: '100%',
     height: '100%',
 
-    padding: 8,
+    padding: isWeb ? 8 : 2,
   },
   imageStyle: {
-    borderRadius: 10,
+    borderRadius: isWeb ? 10 : 6,
   },
   boxText: {
     color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: isWeb ? 16 : 12,
+    fontWeight: isWeb ? 'bold' : 'normal',
   },
 });
 
