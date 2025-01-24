@@ -14,49 +14,6 @@ const Cat = () => {
 
   const [name, setName] = useState(placeholder);
 
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: 20,
-      gap: 10,
-      ...Platform.select({
-        ios: {
-          backgroundColor: 'aliceblue',
-        },
-        android: {
-          backgroundColor: 'ivory',
-        },
-        default: {
-          backgroundColor: 'lavender',
-        },
-      }),
-    },
-    title: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      marginBottom: 10,
-    },
-    sectionHeader: {
-      padding: 8,
-      fontSize: 16,
-      fontWeight: 'bold',
-      backgroundColor: Platform.OS === 'ios' ? 'skyblue' : 'mediumpurple',
-    },
-    input: {
-      padding: 10,
-      fontSize: 16,
-      height: 40,
-      borderWidth: 1,
-      borderColor: Platform.OS === 'ios' ? 'skyblue' : 'mediumpurple',
-      borderRadius: 5,
-    },
-    item: {
-      padding: 10,
-      fontSize: 16,
-      height: 40,
-    },
-  });
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Enter your Cat's name</Text>
@@ -152,5 +109,48 @@ const Cat = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    gap: 10,
+    ...Platform.select({
+      ios: {
+        backgroundColor: 'aliceblue',
+      },
+      android: {
+        backgroundColor: 'ivory',
+      },
+      default: {
+        backgroundColor: 'lavender',
+      },
+    }),
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  sectionHeader: {
+    padding: 8,
+    fontSize: 16,
+    fontWeight: 'bold',
+    backgroundColor: Platform.OS === 'ios' ? 'skyblue' : 'mediumpurple',
+  },
+  input: {
+    padding: 10,
+    fontSize: 16,
+    height: 40,
+    borderWidth: 1,
+    borderColor: Platform.OS === 'ios' ? 'skyblue' : 'mediumpurple',
+    borderRadius: 5,
+  },
+  item: {
+    padding: 10,
+    fontSize: 16,
+    height: 40,
+  },
+});
 
 export default Cat;

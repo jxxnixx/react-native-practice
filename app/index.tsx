@@ -2,6 +2,7 @@ import Cat from '@/components/Cat';
 import DynamicComp from '@/components/platform/DynamicComp';
 import { Text, View } from 'react-native';
 import BigButton from '@/components/platform/buttons/BigButton';
+import CatBox from '@/components/CatBox';
 
 export default function Index() {
   return (
@@ -15,7 +16,7 @@ export default function Index() {
       <DynamicComp />
       <BigButton />
 
-      <Cat />
+      <CatBox />
     </View>
   );
 }
