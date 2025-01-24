@@ -4,6 +4,7 @@ import { ScrollView, Text, View, StyleSheet } from 'react-native';
 import BigButton from '@/components/platform/buttons/BigButton';
 import CatBox from '@/components/CatBox';
 import ImageBox from '@/components/ImageBox';
+import ColorBox from '@/components/ColorBox';
 
 export default function Index() {
   return (
@@ -12,7 +13,8 @@ export default function Index() {
       <BigButton />
 
       {/* <CatBox /> */}
-      <ImageBox />
+      {/* <ImageBox /> */}
+      <ColorBox />
     </View>
   );
 }
