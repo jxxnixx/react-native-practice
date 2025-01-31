@@ -12,6 +12,25 @@ const FadeInAnimation = ({ children, style }: FeadeInViewProps) => {
   const position = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
   // 회전
   const twirl = useRef(new Animated.Value(0)).current;
+  // 스케일
+  const scale = useRef(new Animated.Value(1)).current;
+  // xPosition과 position의 x, y 값에 따라 텍스트 크기 조절
+  const textScale = Animated.add(
+    xPosition.interpolate({
+      inputRange: [-50, 100],
+      outputRange: [1, 0.5],
+    }),
+    Animated.add(
+      position.x.interpolate({
+        inputRange: [-100, 100],
+        outputRange: [0.5, 0],
+      }),
+      position.y.interpolate({
+        inputRange: [-100, 100],
+        outputRange: [0.5, 0],
+      })
+    )
+  );
 
   useEffect(() => {
     // sequence: 배열 안의 애니메이션을 순차적으로 실행. 동기적.
@@ -38,6 +57,12 @@ const FadeInAnimation = ({ children, style }: FeadeInViewProps) => {
             useNativeDriver: true,
           }),
         ]),
+        // 스케일 애니메이션 추가
+        Animated.timing(scale, {
+          toValue: 2,
+          duration: 2000,
+          useNativeDriver: true,
+        }),
       ]),
       // decay: 속도를 감소시키면서 애니메이션 실행
       Animated.decay(position, {
@@ -71,6 +96,7 @@ const FadeInAnimation = ({ children, style }: FeadeInViewProps) => {
             { translateX: xPosition },
             { translateX: position.x },
             { translateY: position.y },
+            { scale },
             {
               rotate: twirl.interpolate({
                 inputRange: [0, 360],
@@ -81,7 +107,16 @@ const FadeInAnimation = ({ children, style }: FeadeInViewProps) => {
         },
       ]}
     >
-      {children}
+      <Animated.Text
+        style={{
+          fontSize: 20,
+          padding: 10,
+          color: 'mediumblue',
+          transform: [{ scale: textScale }],
+        }}
+      >
+        FadeInView
+      </Animated.Text>
     </Animated.View>
   );
 };
@@ -107,9 +142,9 @@ const FadeInView = () => {
           borderRadius: 10,
         }}
       >
-        <Text style={{ fontSize: 20, padding: 10, color: 'mediumblue' }}>
+        {/* <Text style={{ fontSize: 20, padding: 10, color: 'mediumblue' }}>
           FadeInView
-        </Text>
+        </Text> */}
       </FadeInAnimation>
     </View>
   );
