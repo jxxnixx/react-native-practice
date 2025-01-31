@@ -1,5 +1,12 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react';
-import { Animated, View, ViewStyle, Text, Easing } from 'react-native';
+import {
+  Animated,
+  View,
+  ViewStyle,
+  Text,
+  Easing,
+  PanResponder,
+} from 'react-native';
 
 type FeadeInViewProps = PropsWithChildren<{ style: ViewStyle }>;
 
@@ -31,6 +38,43 @@ const FadeInAnimation = ({ children, style }: FeadeInViewProps) => {
       })
     )
   );
+
+  // PanResponder 추가
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderMove: (_, gestureState) => {
+        position.setValue({
+          x: gestureState.dx,
+          y: gestureState.dy,
+        });
+        // 드래그 할 때 회전 효과
+        twirl.setValue(gestureState.dx);
+        // 드래그 거리에 따른 스케일 효과
+        const dragDistance = Math.sqrt(
+          gestureState.dx ** 2 + gestureState.dy ** 2
+        );
+        scale.setValue(1 + dragDistance * 0.003);
+      },
+      onPanResponderRelease: () => {
+        // 드래그 끝나면 원위치로
+        Animated.parallel([
+          Animated.spring(position, {
+            toValue: { x: 0, y: 0 },
+            useNativeDriver: true,
+          }),
+          Animated.spring(scale, {
+            toValue: 1,
+            useNativeDriver: true,
+          }),
+          Animated.spring(twirl, {
+            toValue: 0,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      },
+    })
+  ).current;
 
   useEffect(() => {
     // sequence: 배열 안의 애니메이션을 순차적으로 실행. 동기적.
@@ -88,19 +132,19 @@ const FadeInAnimation = ({ children, style }: FeadeInViewProps) => {
 
   return (
     <Animated.View
+      {...panResponder.panHandlers}
       style={[
         style,
         {
           opacity: fadeAnim,
           transform: [
-            { translateX: xPosition },
             { translateX: position.x },
             { translateY: position.y },
             { scale },
             {
               rotate: twirl.interpolate({
-                inputRange: [0, 360],
-                outputRange: ['0deg', '360deg'],
+                inputRange: [-200, 0, 200],
+                outputRange: ['-45deg', '0deg', '45deg'],
               }),
             },
           ],
