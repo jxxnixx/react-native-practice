@@ -8,6 +8,7 @@ import ColorBox from '@/components/ColorBox';
 import BasicButtons from '@/components/BasicButtons';
 import TouchableButtons from '@/components/TouchableButtons';
 import FadeInView from '@/components/FadeInView';
+import AnimationImageBox from '@/components/AnimationImageBox';
 
 export default function Index() {
   return (
@@ -20,7 +21,8 @@ export default function Index() {
       {/* <ColorBox /> */}
       {/* <BasicButtons /> */}
       {/* <TouchableButtons /> */}
-      <FadeInView />
+      {/* <FadeInView /> */}
+      <AnimationImageBox />
     </View>
   );
 }
