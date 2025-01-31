@@ -10,12 +10,7 @@ import {
   Pressable,
   Easing,
 } from 'react-native';
-
-const squareImages = {
-  1: require('@/assets/images/square/square1.webp'),
-  2: require('@/assets/images/square/square2.webp'),
-  3: require('@/assets/images/square/square3.webp'),
-} as const;
+import { v4 as uuidv4 } from 'uuid';
 
 const rectangleImages = {
   1: require('@/assets/images/rectangle/rectangle1.webp'),
@@ -24,16 +19,100 @@ const rectangleImages = {
   4: require('@/assets/images/rectangle/rectangle4.webp'),
   5: require('@/assets/images/rectangle/rectangle5.webp'),
   6: require('@/assets/images/rectangle/rectangle6.webp'),
+  7: require('@/assets/images/rectangle/rectangle7.webp'),
+  8: require('@/assets/images/rectangle/rectangle8.webp'),
+  9: require('@/assets/images/rectangle/rectangle9.webp'),
 } as const;
 
-const FlippableImage = ({ children }: { children: React.ReactNode }) => {
+// 현재 확대된 이미지의 ID를 추적하는 전역 변수
+let currentScaledImageId: string | null = null;
+
+const FlippableImage = ({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) => {
   const spinValue = useRef(new Animated.Value(0)).current;
+  const scaleValue = useRef(new Animated.Value(1)).current;
   const isFlipping = useRef(false);
   const stopAnimationInProgress = useRef<Animated.CompositeAnimation | null>(
     null
   );
 
+  const resetToFront = (currentValue: number) => {
+    // 현재 회전 값(0~1)을 기준으로 가장 빠른 방향 결정
+    const toValue = currentValue > 0.5 ? 1 : 0;
+    const duration =
+      currentValue > 0.5
+        ? 300 * (1 - currentValue) // 1로 갈 때
+        : 300 * currentValue; // 0으로 갈 때
+
+    Animated.timing(spinValue, {
+      toValue,
+      duration,
+      useNativeDriver: true,
+    }).start(() => {
+      if (toValue === 1) {
+        // 1에 도달하면 즉시 0으로 리셋
+        spinValue.setValue(0);
+      }
+    });
+  };
+
+  const handlePressIn = () => {
+    // 현재 회전 값 확인
+    spinValue.stopAnimation((value) => {
+      resetToFront(value);
+    });
+
+    if (currentScaledImageId === id) {
+      // 현재 이미지 축소
+      currentScaledImageId = null;
+      Animated.spring(scaleValue, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start();
+      return;
+    }
+
+    if (currentScaledImageId !== null) {
+      // 다른 FlippableImage 인스턴스들에게 리셋 신호를 보내기 위한 이벤트
+      const event = new CustomEvent('resetImage', {
+        detail: currentScaledImageId,
+      });
+      window.dispatchEvent(event);
+    }
+
+    // 현재 이미지 확대
+    currentScaledImageId = id;
+
+    Animated.spring(scaleValue, {
+      toValue: 1.2,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  useEffect(() => {
+    const handleResetImage = (event: any) => {
+      if (event.detail === id) {
+        Animated.spring(scaleValue, {
+          toValue: 1,
+          useNativeDriver: true,
+        }).start();
+      }
+    };
+
+    if (isWeb) {
+      window.addEventListener('resetImage', handleResetImage);
+      return () => window.removeEventListener('resetImage', handleResetImage);
+    }
+  }, [id]);
+
   const startFlipping = () => {
+    if (currentScaledImageId !== null) return; // 어떤 이미지든 확대 상태면 회전 금지
+
     if (stopAnimationInProgress.current) {
       // 정지 애니메이션이 진행 중이면 완료될 때까지 기다린 후 회전 시작
       stopAnimationInProgress.current.stop();
@@ -67,7 +146,6 @@ const FlippableImage = ({ children }: { children: React.ReactNode }) => {
         ]).start();
       });
     } else {
-      // 일반적인 회전 시작
       isFlipping.current = true;
 
       Animated.loop(
@@ -91,6 +169,8 @@ const FlippableImage = ({ children }: { children: React.ReactNode }) => {
   };
 
   const stopFlipping = () => {
+    if (currentScaledImageId === id) return; // 클릭된 상태면 stop animation 실행하지 않음
+
     isFlipping.current = false;
 
     spinValue.stopAnimation((value) => {
@@ -117,6 +197,18 @@ const FlippableImage = ({ children }: { children: React.ReactNode }) => {
     });
   };
 
+  const handleMouseLeave = () => {
+    if (currentScaledImageId === id) {
+      // 현재 확대된 이미지에서 마우스가 벗어나면 scale만 1로 복귀
+      currentScaledImageId = null;
+
+      Animated.spring(scaleValue, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
   const spin = spinValue.interpolate({
     inputRange: [0, 1],
     outputRange: ['0deg', '360deg'],
@@ -124,10 +216,15 @@ const FlippableImage = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Pressable
-      onHoverIn={isWeb ? startFlipping : undefined}
-      onHoverOut={isWeb ? stopFlipping : undefined}
-      onPress={isWeb ? undefined : startFlipping}
+      onHoverIn={
+        isWeb && currentScaledImageId !== id ? startFlipping : undefined
+      }
+      onHoverOut={
+        isWeb && currentScaledImageId !== id ? stopFlipping : undefined
+      }
+      onPress={isWeb ? handlePressIn : startFlipping}
       onPressOut={isWeb ? undefined : stopFlipping}
+      onLongPress={!isWeb ? handlePressIn : undefined}
       style={{
         width: '100%',
         height: '100%',
@@ -137,7 +234,11 @@ const FlippableImage = ({ children }: { children: React.ReactNode }) => {
         style={[
           styles.flipContainer,
           {
-            transform: [{ perspective: 1000 }, { rotateY: spin }],
+            transform: [
+              { perspective: 1000 },
+              { rotateY: spin },
+              { scale: scaleValue },
+            ],
           },
         ]}
       >
@@ -147,40 +248,47 @@ const FlippableImage = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const SquareBox = ({ num, text }: { num: 1 | 2 | 3; text?: string }) => {
-  const realText = text ? text : `F1 S${num}`;
+interface BoxProps {
+  row?: number;
+  [key: string]: any;
+}
 
-  return (
-    <View style={styles.imagebox1}>
-      <FlippableImage>
-        <ImageBackground
-          source={squareImages[num]}
-          style={styles.image}
-          imageStyle={styles.imageStyle}
-        >
-          <Text style={styles.boxText}>{realText}</Text>
-        </ImageBackground>
-      </FlippableImage>
-    </View>
-  );
-};
-
-const RectangleBox = ({
-  ratio,
-  num,
-  text,
+const Row = ({
+  children,
+  row,
 }: {
-  ratio: 2 | 3;
-  num: 1 | 2 | 3 | 4 | 5 | 6;
+  children: React.ReactElement<BoxProps>[];
+  row: number;
+}) => (
+  <View style={styles.rowContainer}>
+    {React.Children.map(children, (child) =>
+      React.cloneElement(child, { row })
+    )}
+  </View>
+);
+
+interface RectangleBoxProps {
+  ratio: 1 | 2 | 3;
+  num: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
   text?: string;
-}) => {
-  const imageBoxStyles = ratio === 2 ? styles.imagebox2 : styles.imagebox3;
+  row?: number;
+}
+
+const RectangleBox = ({ ratio, num, text, row }: RectangleBoxProps) => {
+  const id = `rectangle-${ratio}-${num}-${row}-${uuidv4()}`;
+
+  const imageBoxStyles =
+    ratio === 1
+      ? styles.imagebox1
+      : ratio === 2
+      ? styles.imagebox2
+      : styles.imagebox3;
 
   const realText = text ? text : `F${ratio} R${num}`;
 
   return (
     <View style={imageBoxStyles}>
-      <FlippableImage>
+      <FlippableImage id={id}>
         <ImageBackground
           source={rectangleImages[num]}
           style={styles.image}
@@ -193,6 +301,52 @@ const RectangleBox = ({
   );
 };
 
+const rowData = [
+  // row 1
+  [
+    { ratio: 1, num: 7 },
+    { ratio: 1, num: 8 },
+    { ratio: 1, num: 9 },
+    { ratio: 1, num: 7 },
+    { ratio: 1, num: 8 },
+    { ratio: 1, num: 9 },
+    { ratio: 1, num: 7 },
+    { ratio: 1, num: 8 },
+    { ratio: 1, num: 9 },
+    { ratio: 1, num: 7 },
+    { ratio: 1, num: 8 },
+    { ratio: 1, num: 9 },
+  ],
+  // row 2
+  [
+    { ratio: 1, num: 9 },
+    { ratio: 2, num: 1 },
+    { ratio: 1, num: 8 },
+    { ratio: 2, num: 2 },
+  ],
+  // row 3
+  [
+    { ratio: 2, num: 2 },
+    { ratio: 1, num: 8 },
+    { ratio: 3, num: 5 },
+    { ratio: 2, num: 3 },
+  ],
+  // row 4
+  [
+    { ratio: 3, num: 6 },
+    { ratio: 1, num: 8 },
+    { ratio: 1, num: 7 },
+    { ratio: 1, num: 9 },
+  ],
+  // row 5
+  [
+    { ratio: 2, num: 1 },
+    { ratio: 3, num: 5 },
+    { ratio: 2, num: 1 },
+    { ratio: 3, num: 5 },
+  ],
+] as const;
+
 const AnimationImageBox = () => {
   return (
     <ScrollView
@@ -200,53 +354,17 @@ const AnimationImageBox = () => {
       contentContainerStyle={styles.imageboxContainer}
       showsVerticalScrollIndicator={true}
     >
-      {/* 첫 번째 Row */}
-      <View style={styles.rowContainer}>
-        <SquareBox num={1} />
-        <SquareBox num={2} />
-        <SquareBox num={3} />
-        <SquareBox num={1} />
-        <SquareBox num={2} />
-        <SquareBox num={3} />
-        <SquareBox num={1} />
-        <SquareBox num={2} />
-        <SquareBox num={3} />
-        <SquareBox num={1} />
-        <SquareBox num={2} />
-        <SquareBox num={3} />
-      </View>
-
-      {/* 두 번째 Row */}
-      <View style={styles.rowContainer}>
-        <SquareBox num={3} />
-        <RectangleBox ratio={2} num={1} />
-        <SquareBox num={2} />
-        <RectangleBox ratio={2} num={2} />
-      </View>
-
-      {/* 세 번째 Row */}
-      <View style={styles.rowContainer}>
-        <RectangleBox ratio={2} num={2} />
-        <SquareBox num={2} />
-        <RectangleBox ratio={3} num={5} />
-        <RectangleBox ratio={2} num={3} />
-      </View>
-
-      {/* 네 번째 Row */}
-      <View style={styles.rowContainer}>
-        <RectangleBox ratio={3} num={6} />
-        <SquareBox num={2} />
-        <SquareBox num={1} />
-        <SquareBox num={3} />
-      </View>
-
-      {/* 다섯 번째 Row */}
-      <View style={styles.rowContainer}>
-        <RectangleBox ratio={2} num={1} />
-        <RectangleBox ratio={3} num={5} />
-        <RectangleBox ratio={2} num={1} />
-        <RectangleBox ratio={3} num={5} />
-      </View>
+      {rowData.map((row, rowIndex) => (
+        <Row key={rowIndex} row={rowIndex + 1}>
+          {row.map((box, boxIndex) => (
+            <RectangleBox
+              key={boxIndex}
+              ratio={box.ratio as 1 | 2 | 3}
+              num={box.num as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}
+            />
+          ))}
+        </Row>
+      ))}
     </ScrollView>
   );
 };
