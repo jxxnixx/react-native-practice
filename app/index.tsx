@@ -6,6 +6,7 @@ import CatBox from '@/components/CatBox';
 import ImageBox from '@/components/ImageBox';
 import ColorBox from '@/components/ColorBox';
 import BasicButtons from '@/components/BasicButtons';
+import TouchableButtons from '@/components/TouchableButtons';
 
 export default function Index() {
   return (
@@ -16,7 +17,8 @@ export default function Index() {
       {/* <CatBox /> */}
       {/* <ImageBox /> */}
       {/* <ColorBox /> */}
-      <BasicButtons />
+      {/* <BasicButtons /> */}
+      <TouchableButtons />
     </View>
   );
 }
