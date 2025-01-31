@@ -5,6 +5,7 @@ import BigButton from '@/components/platform/buttons/BigButton';
 import CatBox from '@/components/CatBox';
 import ImageBox from '@/components/ImageBox';
 import ColorBox from '@/components/ColorBox';
+import BasicButtons from '@/components/BasicButtons';
 
 export default function Index() {
   return (
@@ -14,7 +15,8 @@ export default function Index() {
 
       {/* <CatBox /> */}
       {/* <ImageBox /> */}
-      <ColorBox />
+      {/* <ColorBox /> */}
+      <BasicButtons />
     </View>
   );
 }
