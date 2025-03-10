@@ -22,7 +22,8 @@ export default function RootLayout() {
         ),
       }}
     >
-      {/* <Stack.Screen name="Cat" options={{ headerShown: true }} /> */}
+      <Stack.Screen name="cafe" options={{ headerShown: true }} />
+      <Stack.Screen name="pub" options={{ headerShown: true }} />
     </Stack>
   );
 }
