@@ -1,0 +1,62 @@
+{
+  "pub_ingredients": [
+    {
+      "name": "앵글로 비터스",
+      "image": "/assets/images/pub/anglorbitter.webp"
+    },
+    { "name": "애플 리큐르", "image": "/assets/images/pub/appleliqueur.webp" },
+    { "name": "베일리스", "image": "/assets/images/pub/baileys.webp" },
+    { "name": "블루 큐라소", "image": "/assets/images/pub/bluecuracao.webp" },
+    { "name": "캄파리", "image": "/assets/images/pub/campari.webp" },
+    { "name": "샴페인", "image": "/assets/images/pub/champagne.webp" },
+    { "name": "칠리 시럽", "image": "/assets/images/pub/chilisyrup.webp" },
+    { "name": "코코넛 밀크", "image": "/assets/images/pub/coconutmilk.webp" },
+    { "name": "커피", "image": "/assets/images/pub/coffee.webp" },
+    { "name": "커피 리큐르", "image": "/assets/images/pub/coffeeliqueur.webp" },
+    { "name": "콜라", "image": "/assets/images/pub/coke.webp" },
+    { "name": "크림", "image": "/assets/images/pub/cream.webp" },
+    {
+      "name": "드라이 베르무트",
+      "image": "/assets/images/pub/dryvermouth.webp"
+    },
+
+    { "name": "진", "image": "/assets/images/pub/gin.webp" },
+    { "name": "진저에일", "image": "/assets/images/pub/gingerale.webp" },
+    { "name": "진저비어", "image": "/assets/images/pub/gingerbeer.webp" },
+    { "name": "그레나딘", "image": "/assets/images/pub/grenadine.webp" },
+
+    { "name": "레몬", "image": "/assets/images/pub/lemon.webp" },
+    { "name": "레몬쥬스", "image": "/assets/images/pub/lemonjuice.webp" },
+    { "name": "라임", "image": "/assets/images/pub/lime.webp" },
+    { "name": "리치 리큐르", "image": "/assets/images/pub/lycheeliqueur.webp" },
+    { "name": "우유", "image": "/assets/images/pub/milk.webp" },
+    { "name": "민트", "image": "/assets/images/pub/mint.webp" },
+    { "name": "오렌지", "image": "/assets/images/pub/orange.webp" },
+    { "name": "오렌지쥬스", "image": "/assets/images/pub/orangejuice.webp" },
+    {
+      "name": "페퍼민트 시럽",
+      "image": "/assets/images/pub/peppermintsyrup.webp"
+    },
+
+    {
+      "name": "파인애플 쥬스",
+      "image": "/assets/images/pub/pineapplejuice.webp"
+    },
+    { "name": "라즈베리 리큐르", "image": "/assets/images/pub/raspberry.webp" },
+    { "name": "럼", "image": "/assets/images/pub/rum.webp" },
+    { "name": "소금", "image": "/assets/images/pub/salt.webp" },
+    { "name": "소다워터", "image": "/assets/images/pub/sodawater.webp" },
+    { "name": "설탕", "image": "/assets/images/pub/sugar.webp" },
+    {
+      "name": "스위트 베르무트",
+      "image": "/assets/images/pub/sweetvermouth.webp"
+    },
+    { "name": "타로 리큐르", "image": "/assets/images/pub/taroliqueur.webp" },
+    { "name": "테킬라", "image": "/assets/images/pub/tequila.webp" },
+    { "name": "토마토 쥬스", "image": "/assets/images/pub/tomatojuice.webp" },
+    { "name": "토닉워터", "image": "/assets/images/pub/tonicwater.webp" },
+    { "name": "트리플 섹", "image": "/assets/images/pub/triplesec.webp" },
+    { "name": "보드카", "image": "/assets/images/pub/vodka.webp" },
+    { "name": "위스키", "image": "/assets/images/pub/whiskey.webp" }
+  ]
+}

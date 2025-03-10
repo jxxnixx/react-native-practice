@@ -1,0 +1,44 @@
+{
+  "cafe_ingredients": [
+    { "name": "사과", "image": "apple" },
+    { "name": "바나나", "image": "banana" },
+    { "name": "딸기", "image": "strawberry" },
+    { "name": "블루베리", "image": "blueberries" },
+    {
+      "name": "카라멜 시럽",
+      "image": "caramelsyrup"
+    },
+    { "name": "캐모마일", "image": "camomile" },
+    { "name": "치즈케이크", "image": "cheesecake" },
+    { "name": "코코넛", "image": "coconut" },
+    { "name": "커피", "image": "coffee" },
+    {
+      "name": "다크 초콜릿",
+      "image": "darkchocolate"
+    },
+    { "name": "얼그레이", "image": "earlgrey" },
+    { "name": "에스프레소", "image": "espresso" },
+    { "name": "플로럴 시럽", "image": "flowersyrup" },
+    { "name": "자몽", "image": "grapefruit" },
+    { "name": "꿀", "image": "honey" },
+    { "name": "얼음", "image": "ice" },
+    { "name": "키위", "image": "kiwi" },
+    { "name": "레몬", "image": "lemon" },
+    { "name": "망고", "image": "mango" },
+    { "name": "우유", "image": "milk" },
+    {
+      "name": "초콜릿",
+      "image": "milkchocolate"
+    },
+    { "name": "민트", "image": "mint" },
+    { "name": "오렌지", "image": "orange" },
+    { "name": "복숭아", "image": "peach" },
+    { "name": "라즈베리", "image": "raspberry" },
+    { "name": "로즈마리", "image": "rosemary" },
+    { "name": "탄산수", "image": "sparklingwater" },
+    { "name": "딸기", "image": "strawberry" },
+    { "name": "바닐라 시럽", "image": "vanillasyrup" },
+    { "name": "물", "image": "water" },
+    { "name": "요거트", "image": "yogurt" }
+  ]
+}
