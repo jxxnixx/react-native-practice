@@ -10,6 +10,7 @@ import {
   Pressable,
   Easing,
 } from 'react-native';
+import 'react-native-get-random-values';
 import { v4 as uuidv4 } from 'uuid';
 
 const rectangleImages = {
@@ -275,7 +276,11 @@ interface RectangleBoxProps {
 }
 
 const RectangleBox = ({ ratio, num, text, row }: RectangleBoxProps) => {
-  const id = `rectangle-${ratio}-${num}-${row}-${uuidv4()}`;
+  const id = `rectangle-${ratio}-${num}-${row}-${
+    Platform.OS === 'web'
+      ? uuidv4()
+      : Math.random().toString(36).substring(2, 15)
+  }`;
 
   const imageBoxStyles =
     ratio === 1
