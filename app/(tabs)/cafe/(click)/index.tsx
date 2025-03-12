@@ -30,40 +30,11 @@ const index = () => {
   // 화면 크기 상태 관리 (반응형 디자인을 위함)
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
 
-  // 현재 hover 또는 탭된 아이템의 인덱스 관리
-  const [hoveredIndex, setHoveredIndex] = useState<string | null>(null);
-
   // bowl에 선택된 재료들을 관리하는 상태
   const [selectedIngredients, setSelectedIngredients] = useState<any[]>([]);
 
   // bowl 요소에 대한 참조 (위치 측정을 위함)
   const bowlRef = useRef<View>(null);
-
-  // bowl의 화면상 위치와 크기 정보
-  const [bowlLayout, setBowlLayout] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
-
-  // ScrollView에 대한 참조 (드래그 중 스크롤 제어를 위함)
-  const scrollViewRef = useRef<ScrollView>(null);
-
-  // 현재 스크롤 위치 (bowl 위치 계산에 사용)
-  const [scrollOffset, setScrollOffset] = useState(0);
-
-  // 스크롤 활성화 상태를 관리하는 상태 추가
-  const [scrollEnabled, setScrollEnabled] = useState(true);
-
-  // 드래그 중인 아이템 상태를 컴포넌트 레벨로 이동
-  const [draggingItem, setDraggingItem] = useState<string | null>(null);
-
-  // Replace onMouseEnter/onMouseLeave with a hover state and Pressable
-  const [isHovered, setIsHovered] = useState(false);
-
-  // 상수 추가
-  const isWeb = Platform.OS === 'web';
 
   // 컴포넌트 최상단에 상태 추가
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
@@ -166,7 +137,10 @@ const index = () => {
   const containerPadding = 10;
   const itemMargin = 2;
   const availableWidth = dimensions.width - containerPadding * 2;
-  const itemWidth = availableWidth / itemsPerRow - itemMargin * 2;
+  // 아이템 최대 크기를 60으로 제한
+  const maxItemSize = 60;
+  const calculatedItemWidth = availableWidth / itemsPerRow - itemMargin * 2;
+  const itemWidth = Math.min(calculatedItemWidth, maxItemSize);
 
   /**
    * 첫 번째 줄과 두 번째 줄로 데이터 분할
@@ -199,233 +173,6 @@ const index = () => {
   const firstRowAnimations = useRef(createAnimatedItems(firstRow)).current;
   const secondRowAnimations = useRef(createAnimatedItems(secondRow)).current;
   const thirdRowAnimations = useRef(createAnimatedItems(thirdRow)).current;
-  /**
-   * 아이템 확대 애니메이션 함수
-   *
-   * 아이템을 hover하거나 탭할 때 호출되어 아이템을 확대하고
-   * z-index를 높여 다른 아이템 위에 표시되도록 합니다.
-   *
-   * @param animation 애니메이션 값 객체
-   */
-  const scaleUp = (animation: any) => {
-    // 여러 애니메이션을 동시에 실행
-    Animated.parallel([
-      // 크기를 1.2배로 확대 (spring 애니메이션으로 자연스러운 효과)
-      Animated.spring(animation.scale, {
-        toValue: 1.2,
-        friction: 5, // 마찰력 (낮을수록 더 튕김)
-        useNativeDriver: true, // 네이티브 드라이버 사용 (성능 향상)
-      }),
-      // z-index를 10으로 높여 다른 아이템 위에 표시
-      Animated.timing(animation.zIndex, {
-        toValue: 10,
-        duration: 100,
-        useNativeDriver: false, // z-index는 네이티브 드라이버 사용 불가
-      }),
-    ]).start(); // 애니메이션 시작
-  };
-
-  /**
-   * 아이템 축소 애니메이션 함수
-   *
-   * hover나 탭이 해제될 때 호출되어 아이템을 원래 크기로 되돌리고
-   * z-index를 원래대로 낮춥니다.
-   *
-   * @param animation 애니메이션 값 객체
-   */
-  const scaleDown = (animation: any) => {
-    // 여러 애니메이션을 동시에 실행
-    Animated.parallel([
-      // 크기를 원래대로 (1배) 축소
-      Animated.spring(animation.scale, {
-        toValue: 1,
-        friction: 5,
-        useNativeDriver: true,
-      }),
-      // z-index를 1로 되돌림
-      Animated.timing(animation.zIndex, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: false,
-      }),
-    ]).start();
-  };
-
-  /**
-   * 웹에서 hover 처리 함수
-   */
-  const handleHover = (
-    rowIndex: number,
-    itemIndex: number,
-    isHovered: boolean
-  ) => {
-    // 웹 환경에서만 동작
-    if (Platform.OS === 'web') {
-      // 현재 hover된 아이템의 인덱스 (형식: "행-열")
-      const newHoveredIndex = isHovered ? `${rowIndex}-${itemIndex}` : null;
-
-      // 이전에 hover된 아이템이 있고, 현재 hover된 아이템과 다르면
-      if (hoveredIndex !== null && hoveredIndex !== newHoveredIndex) {
-        // 이전 hover 아이템의 행과 열 인덱스 추출
-        const [prevRowIndex, prevItemIndex] = hoveredIndex
-          .split('-')
-          .map(Number);
-
-        // 이전 아이템의 애니메이션 객체 가져오기
-        let prevAnimation;
-        if (prevRowIndex === 0) {
-          prevAnimation = firstRowAnimations[prevItemIndex];
-        } else if (prevRowIndex === 1) {
-          prevAnimation = secondRowAnimations[prevItemIndex];
-        } else {
-          prevAnimation = thirdRowAnimations[prevItemIndex];
-        }
-
-        // 이전 아이템 축소
-        scaleDown(prevAnimation);
-      }
-
-      // 현재 아이템이 hover 상태이면
-      if (isHovered) {
-        // 현재 아이템의 애니메이션 객체 가져오기
-        let currentAnimation;
-        if (rowIndex === 0) {
-          currentAnimation = firstRowAnimations[itemIndex];
-        } else if (rowIndex === 1) {
-          currentAnimation = secondRowAnimations[itemIndex];
-        } else {
-          currentAnimation = thirdRowAnimations[itemIndex];
-        }
-
-        // 현재 아이템 확대
-        scaleUp(currentAnimation);
-      }
-
-      // hover 상태 업데이트
-      setHoveredIndex(newHoveredIndex);
-    }
-  };
-
-  /**
-   * 모바일에서 탭 처리 함수
-   */
-  const handlePress = (rowIndex: number, itemIndex: number) => {
-    // 모바일 환경에서만 동작 (웹이 아닌 경우)
-    if (Platform.OS !== 'web') {
-      // 현재 탭된 아이템의 인덱스 (형식: "행-열")
-      const newHoveredIndex = `${rowIndex}-${itemIndex}`;
-
-      // 이전에 활성화된 아이템이 있고, 현재 탭된 아이템과 다르면
-      if (hoveredIndex !== null && hoveredIndex !== newHoveredIndex) {
-        // 이전 활성 아이템의 행과 열 인덱스 추출
-        const [prevRowIndex, prevItemIndex] = hoveredIndex
-          .split('-')
-          .map(Number);
-
-        // 이전 아이템의 애니메이션 객체 가져오기
-        let prevAnimation;
-        if (prevRowIndex === 0) {
-          prevAnimation = firstRowAnimations[prevItemIndex];
-        } else if (prevRowIndex === 1) {
-          prevAnimation = secondRowAnimations[prevItemIndex];
-        } else {
-          prevAnimation = thirdRowAnimations[prevItemIndex];
-        }
-
-        // 이전 아이템 축소
-        scaleDown(prevAnimation);
-      }
-
-      // 현재 아이템의 애니메이션 객체 가져오기
-      let currentAnimation;
-      if (rowIndex === 0) {
-        currentAnimation = firstRowAnimations[itemIndex];
-      } else if (rowIndex === 1) {
-        currentAnimation = secondRowAnimations[itemIndex];
-      } else {
-        currentAnimation = thirdRowAnimations[itemIndex];
-      }
-
-      // 같은 아이템을 다시 탭한 경우
-      if (hoveredIndex === newHoveredIndex) {
-        // 아이템 축소 및 활성 상태 해제
-        scaleDown(currentAnimation);
-        setHoveredIndex(null);
-      } else {
-        // 새 아이템 확대 및 활성 상태 설정
-        scaleUp(currentAnimation);
-        setHoveredIndex(newHoveredIndex);
-      }
-    }
-  };
-
-  /**
-   * Bowl 레이아웃 측정 함수
-   *
-   * bowl 요소의 화면상 위치와 크기를 측정하여 저장합니다.
-   * 이 정보는 드래그한 아이템이 bowl 위에 있는지 판단하는 데 사용됩니다.
-   */
-  const measureBowl = () => {
-    if (bowlRef.current) {
-      // measure 메서드로 요소의 위치와 크기 측정
-      bowlRef.current.measure((x, y, width, height, pageX, pageY) => {
-        setBowlLayout({
-          x: pageX,
-          y: pageY - scrollOffset, // 스크롤 오프셋 고려하여 정확한 y 위치 계산
-          width,
-          height,
-        });
-      });
-    }
-  };
-
-  /**
-   * 스크롤 이벤트 처리 함수
-   *
-   * 스크롤 시 현재 스크롤 위치를 저장하고 bowl 위치를 다시 측정합니다.
-   *
-   * @param event 스크롤 이벤트 객체
-   */
-  const handleScroll = (event: any) => {
-    const offsetY = event.nativeEvent.contentOffset.y;
-    setScrollOffset(offsetY);
-    // 스크롤 시 bowl 위치 다시 측정
-    measureBowl();
-  };
-
-  // 컴포넌트 마운트 후 Bowl 위치 측정
-  useEffect(() => {
-    // 약간의 지연 후 측정 (레이아웃이 완전히 렌더링된 후)
-    setTimeout(measureBowl, 500);
-  }, []);
-
-  /**
-   * 드래그한 아이템이 bowl 위에 있는지 확인하는 함수
-   *
-   * @param gestureState 드래그 제스처 상태 객체
-   * @returns bowl 위에 있으면 true, 아니면 false
-   */
-  const isOverBowl = (gestureState: any) => {
-    if (!bowlLayout) return false;
-
-    // 드래그 중인 아이템의 현재 위치 계산
-    const itemX = gestureState.moveX;
-    const itemY = gestureState.moveY;
-
-    // bowl의 경계 계산
-    const bowlLeft = bowlLayout.x;
-    const bowlRight = bowlLayout.x + bowlLayout.width;
-    const bowlTop = bowlLayout.y;
-    const bowlBottom = bowlLayout.y + bowlLayout.height;
-
-    // 아이템이 bowl 영역 내에 있는지 확인 (완전히 포함되어야 함)
-    return (
-      itemX >= bowlLeft &&
-      itemX <= bowlRight &&
-      itemY >= bowlTop &&
-      itemY <= bowlBottom
-    );
-  };
 
   // 아이템 순차 애니메이션 효과 구현 (개선된 버전)
   useEffect(() => {
@@ -493,61 +240,34 @@ const index = () => {
     // 아이템이 애니메이션 되었는지 확인
     const isAnimated = animatedItems[itemAnimationKey] || false;
 
-    // 현재 아이템이 선택되었는지 확인
-    const isSelected = selectedItemId === itemId;
-
-    // 선택된 아이템이 변경될 때 애니메이션 적용
-    useEffect(() => {
-      if (isSelected) {
-        // 이 아이템이 선택되면 확대
-        Animated.spring(animation.scale, {
-          toValue: 1.2,
-          friction: 7,
-          tension: 40,
-          useNativeDriver: true,
-        }).start();
-      } else {
-        // 이 아이템이 선택되지 않았으면 원래 크기로
-        Animated.spring(animation.scale, {
-          toValue: 1,
-          friction: 7,
-          tension: 40,
-          useNativeDriver: true,
-        }).start();
-      }
-    }, [selectedItemId]);
-
     // 호버 효과 처리 함수 (웹용)
     const handleItemHover = (hovered: boolean) => {
       setIsHovered(hovered);
     };
 
-    // 클릭/탭 효과 처리 함수 (웹/모바일 공통)
+    // 클릭/탭 효과 처리 함수 (웹/모바일 공통) - 수정된 부분
     const handleItemPress = () => {
-      // 이미 선택된 아이템을 다시 클릭한 경우
-      if (isSelected) {
-        // 이미 Bowl에 같은 재료가 있는지 확인
-        const isDuplicate = selectedIngredients.some(
-          (item) => item.name === ingredient.name
-        );
+      // 이미 Bowl에 같은 재료가 있는지 확인
+      const isDuplicate = selectedIngredients.some(
+        (item) => item.name === ingredient.name
+      );
 
-        // 중복이 아닌 경우에만 추가
-        if (!isDuplicate) {
-          // Bowl에 재료 추가
-          setSelectedIngredients((prev) => [...prev, ingredient]);
-          console.log('Added to bowl:', ingredient.name);
-        } else {
-          console.log('Ingredient already in bowl:', ingredient.name);
-        }
-
-        // 선택 상태 해제
-        setSelectedItemId(null);
+      // 중복이 아닌 경우에만 추가
+      if (!isDuplicate) {
+        // Bowl에 재료 추가
+        setSelectedIngredients((prev) => [...prev, ingredient]);
+        console.log('Added to bowl:', ingredient.name);
 
         // 추가 애니메이션 (축소 후 원래 크기로)
         Animated.sequence([
           Animated.timing(animation.scale, {
+            toValue: 1.2,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animation.scale, {
             toValue: 0.8,
-            duration: 150,
+            duration: 100,
             useNativeDriver: true,
           }),
           Animated.timing(animation.scale, {
@@ -557,8 +277,26 @@ const index = () => {
           }),
         ]).start();
       } else {
-        // 새로운 아이템 선택
-        setSelectedItemId(itemId);
+        console.log('Ingredient already in bowl:', ingredient.name);
+
+        // 이미 추가된 재료임을 알리는 애니메이션 (흔들림 효과)
+        Animated.sequence([
+          Animated.timing(animation.scale, {
+            toValue: 1.1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animation.scale, {
+            toValue: 0.9,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+          Animated.timing(animation.scale, {
+            toValue: 1,
+            duration: 100,
+            useNativeDriver: true,
+          }),
+        ]).start();
       }
     };
 
@@ -589,7 +327,7 @@ const index = () => {
                 }),
               },
             ],
-            zIndex: isSelected ? 10 : 1,
+            zIndex: 1,
           },
         ]}
       >
@@ -700,12 +438,11 @@ const index = () => {
   // 컴포넌트 렌더링
   return (
     <View style={styles.container}>
-      {/* 스크롤 가능한 컨테이너 */}
-      <ScrollView
-        ref={scrollViewRef}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
-      >
+      <View style={styles.mainContent}>
+        <Text style={styles.debugText}>
+          선택된 재료 수: {selectedIngredients.length}/8
+        </Text>
+
         {/* 첫 번째 줄 재료 */}
         <View style={styles.rowContainer}>
           {firstRow.map((ingredient, idx) =>
@@ -730,7 +467,7 @@ const index = () => {
         {/* Bowl 컨테이너 */}
         <View style={styles.bowlContainer}>
           {/* Bowl (재료를 넣을 영역) */}
-          <View ref={bowlRef} style={styles.bowl} onLayout={measureBowl}>
+          <View ref={bowlRef} style={styles.bowl}>
             <Text style={styles.bowlText}>Bowl</Text>
 
             {/* 선택된 재료 표시 영역 */}
@@ -748,9 +485,9 @@ const index = () => {
           </View>
 
           {/* 선택된 재료 목록 텍스트 (있을 경우에만 표시) */}
-          <Text style={styles.selectedIngredientsText}>
+          {/* <Text style={styles.selectedIngredientsText}>
             선택된 재료: {selectedIngredients.map((i) => i.name).join(', ')}
-          </Text>
+          </Text> */}
 
           {/* 버튼 컨테이너 */}
           <View style={styles.buttonContainer}>
@@ -777,9 +514,7 @@ const index = () => {
           {/* 완성된 레시피 목록 - FlatList 사용 */}
           {completedRecipes.length > 0 && (
             <View style={styles.completedRecipesListContainer}>
-              <Text style={styles.completedRecipesTitle}>
-                완성한 레시피 목록
-              </Text>
+              <Text style={styles.completedRecipesTitle}>완성한 레시피</Text>
 
               <FlatList
                 data={completedRecipes}
@@ -822,14 +557,18 @@ const index = () => {
                 )}
                 style={styles.recipesList}
                 contentContainerStyle={styles.recipesListContent}
-                showsVerticalScrollIndicator={false}
+                showsVerticalScrollIndicator={true}
                 scrollEnabled={true}
                 nestedScrollEnabled={true}
+                scrollEventThrottle={16}
+                initialNumToRender={4}
+                windowSize={5}
+                removeClippedSubviews={Platform.OS !== 'web'}
               />
             </View>
           )}
         </View>
-      </ScrollView>
+      </View>
 
       {/* 팝업 */}
       {showPopup && completedRecipes.length > 0 && (
@@ -860,23 +599,19 @@ const index = () => {
  * 각 스타일은 해당 요소의 레이아웃, 색상, 크기 등을 정의합니다.
  */
 const styles = StyleSheet.create({
-  /**
-   * 최상위 컨테이너 스타일
-   *
-   * 전체 화면을 차지하며 흰색 배경과 패딩을 가집니다.
-   */
   container: {
-    flex: 1, // 사용 가능한 공간 전체 차지
-    backgroundColor: '#fff', // 흰색 배경
-    padding: 10, // 모든 방향에 10의 패딩
+    flex: 1,
+    backgroundColor: '#fff',
+    padding: 10,
   },
-
+  mainContent: {
+    flex: 1,
+  },
   rowWrapper: {
     flexDirection: 'column',
     justifyContent: 'space-between',
     paddingVertical: 10,
   },
-
   /**
    * 행 컨테이너 스타일
    *
@@ -889,8 +624,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', // 세로 방향 중앙 정렬
     marginBottom: 10, // 아래쪽 여백
     flexWrap: 'nowrap', // 줄바꿈 방지 (항상 한 줄에 모든 아이템 표시)
+    height: 60, // 고정 높이 60으로 설정
   },
-
   /**
    * 원형 아이템 스타일
    *
@@ -900,9 +635,10 @@ const styles = StyleSheet.create({
   circleItem: {
     alignItems: 'center', // 가로 방향 중앙 정렬
     marginBottom: 5, // 아래쪽 여백
+    maxWidth: 60, // 최대 너비 60으로 제한
+    maxHeight: 60, // 최대 높이 60으로 제한
     userSelect: 'none',
   },
-
   /**
    * 원형 이미지 스타일
    *
@@ -914,7 +650,6 @@ const styles = StyleSheet.create({
     // width, height, borderRadius는 동적으로 설정됨
     userSelect: 'none',
   },
-
   /**
    * 재료 이름 텍스트 스타일
    *
@@ -928,7 +663,6 @@ const styles = StyleSheet.create({
     // width는 동적으로 설정됨
     userSelect: 'none',
   },
-
   /**
    * Bowl 컨테이너 스타일
    *
@@ -942,7 +676,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     zIndex: 1, // 낮은 z-index 설정
   },
-
   /**
    * Bowl 스타일
    *
@@ -965,7 +698,6 @@ const styles = StyleSheet.create({
     elevation: 3,
     zIndex: 1, // 낮은 z-index 설정
   },
-
   /**
    * Bowl 텍스트 스타일
    *
@@ -976,7 +708,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold', // 굵은 글씨
     color: '#888', // 회색 텍스트
   },
-
   /**
    * 선택된 재료 컨테이너 스타일
    *
@@ -991,7 +722,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center', // 가로 방향 중앙 정렬
     alignItems: 'center', // 세로 방향 중앙 정렬
   },
-
   /**
    * 선택된 개별 재료 스타일
    *
@@ -1002,7 +732,6 @@ const styles = StyleSheet.create({
     height: 30, // 높이
     margin: 2, // 모든 방향 여백
   },
-
   /**
    * 선택된 재료 이미지 스타일
    *
@@ -1014,7 +743,6 @@ const styles = StyleSheet.create({
     height: '100%', // 부모 컨테이너 높이 전체
     borderRadius: 15, // 둥근 모서리 (원형)
   },
-
   /**
    * 선택된 재료 텍스트 컨테이너 스타일
    *
@@ -1024,7 +752,6 @@ const styles = StyleSheet.create({
     marginTop: 10, // 위쪽 여백
     alignItems: 'center', // 가로 방향 중앙 정렬
   },
-
   /**
    * 선택된 재료 텍스트 스타일
    *
@@ -1034,8 +761,8 @@ const styles = StyleSheet.create({
     fontSize: 12, // 글씨 크기
     textAlign: 'center', // 텍스트 중앙 정렬
     marginBottom: 5, // 아래쪽 여백
+    marginTop: 15,
   },
-
   /**
    * 버튼 컨테이너 스타일
    *
@@ -1047,7 +774,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginBottom: 20,
   },
-
   /**
    * 버튼 공통 스타일
    *
@@ -1060,7 +786,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginHorizontal: 10,
   },
-
   /**
    * 만들기 버튼 스타일
    *
@@ -1069,7 +794,6 @@ const styles = StyleSheet.create({
   makeButton: {
     backgroundColor: '#4CAF50',
   },
-
   /**
    * 버튼 텍스트 스타일
    *
@@ -1079,61 +803,57 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#333',
   },
-
   /**
    * 완성된 레시피 컨테이너 스타일
    */
   completedRecipesListContainer: {
-    marginTop: 20,
+    marginTop: 15,
     width: '100%',
     maxWidth: 400,
     alignItems: 'center',
+    // 재료 3줄을 기준으로 최대 높이 설정
+    maxHeight: 300, // 픽셀 단위로 변경
   },
-
   /**
    * 완성된 레시피 목록 제목 스타일
    */
   completedRecipesTitle: {
-    fontSize: 20,
+    fontSize: 18, // 약간 작게 조정
     fontWeight: 'bold',
-    marginBottom: 15,
+    marginBottom: 10, // 마진 줄임
     color: '#333',
     textAlign: 'center',
   },
-
   /**
    * 레시피 FlatList 스타일
    */
   recipesList: {
     width: '100%',
-    maxHeight: 300,
+    maxHeight: 250,
   },
-
   /**
    * 레시피 FlatList 내부 컨텐츠 스타일
    */
   recipesListContent: {
     paddingVertical: 8,
   },
-
   /**
    * 완성된 레시피 아이템 스타일
    */
   completedRecipeItem: {
     width: '100%',
-    padding: 12,
+    padding: 10, // 패딩 약간 줄임
     backgroundColor: '#fff',
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#e0e0e0',
-    marginBottom: 10,
+    marginBottom: 8, // 마진 약간 줄임
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
   },
-
   /**
    * 레시피 아이템 컨테이너 스타일
    */
@@ -1143,7 +863,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: '100%',
   },
-
   /**
    * 레시피 이름 컨테이너 스타일
    */
@@ -1151,7 +870,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   /**
    * 완성된 레시피 제목 스타일
    */
@@ -1160,7 +878,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
   },
-
   /**
    * 레시피 말풍선 스타일
    */
@@ -1180,7 +897,6 @@ const styles = StyleSheet.create({
     elevation: 3,
     zIndex: 10,
   },
-
   /**
    * 말풍선 화살표 스타일
    */
@@ -1198,7 +914,6 @@ const styles = StyleSheet.create({
     borderRightWidth: 10,
     borderRightColor: '#ddd',
   },
-
   /**
    * 레시피 설명 스타일
    */
@@ -1208,7 +923,6 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     lineHeight: 18,
   },
-
   /**
    * 레시피 재료 스타일
    */
@@ -1217,7 +931,6 @@ const styles = StyleSheet.create({
     color: '#777',
     fontStyle: 'italic',
   },
-
   /**
    * 팝업 오버레이 스타일
    *
@@ -1234,7 +947,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
   },
-
   /**
    * 팝업 스타일
    *
@@ -1252,7 +964,6 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
-
   /**
    * 팝업 제목 스타일
    *
@@ -1264,7 +975,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     color: '#333',
   },
-
   /**
    * 팝업 설명 스타일
    *
@@ -1276,7 +986,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 15,
   },
-
   /**
    * 팝업 닫기 버튼 스타일
    *
@@ -1288,7 +997,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 5,
   },
-
   /**
    * 팝업 닫기 버튼 텍스트 스타일
    *
@@ -1297,6 +1005,12 @@ const styles = StyleSheet.create({
   popupCloseButtonText: {
     fontSize: 14,
     color: '#333',
+  },
+  debugText: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginBottom: 10,
+    color: '#666',
   },
 });
 
