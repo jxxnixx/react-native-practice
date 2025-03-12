@@ -1,30 +1,122 @@
 {
+  "categories": [
+    {
+      "name": "과일",
+      "ingredients": [
+        { "name": "사과", "image": "apple" },
+        { "name": "바나나", "image": "banana" },
+        { "name": "블루베리", "image": "blueberries" },
+        { "name": "체리", "image": "cherry" },
+        { "name": "코코넛", "image": "coconut" },
+        { "name": "자몽", "image": "grapefruit" },
+        { "name": "청포도", "image": "greengrapes" },
+        { "name": "키위", "image": "kiwi" },
+        { "name": "레몬", "image": "lemon" },
+        { "name": "라임", "image": "lime" },
+        { "name": "망고", "image": "mango" },
+        { "name": "오렌지", "image": "orange" },
+        { "name": "복숭아", "image": "peach" },
+        { "name": "파인애플", "image": "pineapple" },
+        { "name": "라즈베리", "image": "raspberries" },
+        { "name": "딸기", "image": "strawberry" },
+        { "name": "수박", "image": "watermelon" },
+        { "name": "유자", "image": "yuzu" }
+      ]
+    },
+    {
+      "name": "시럽",
+      "ingredients": [
+        { "name": "카라멜 시럽", "image": "caramelsyrup" },
+        { "name": "치즈케이크 시럽", "image": "cheesecakesyrup" },
+        { "name": "플로럴 시럽", "image": "flowersyrup" },
+        { "name": "헤이즐넛 시럽", "image": "hazelnutsyrup" },
+        { "name": "바닐라 시럽", "image": "vanillasyrup" },
+        { "name": "시럽", "image": "syrup" }
+      ]
+    },
+    {
+      "name": "베이스",
+      "ingredients": [
+        { "name": "커피", "image": "coffee" },
+        { "name": "에스프레소", "image": "espresso" },
+        { "name": "물", "image": "water" },
+        { "name": "탄산수", "image": "sparklingwater" },
+        { "name": "우유", "image": "milk" },
+        { "name": "얼음", "image": "ice" }
+      ]
+    },
+    {
+      "name": "유제품",
+      "ingredients": [
+        { "name": "치즈케이크", "image": "cheesecake" },
+        { "name": "마스카포네치즈", "image": "mascarponecheese" },
+        { "name": "휘핑크림", "image": "whippedcream" },
+        { "name": "요거트파우더", "image": "yogurtpowder" }
+      ]
+    },
+    {
+      "name": "디저트",
+      "ingredients": [
+        { "name": "초콜릿", "image": "chocolate" },
+        { "name": "쿠키앤크림", "image": "cookieandcream" },
+        { "name": "다크 초콜릿", "image": "darkchocolate" },
+        { "name": "꿀", "image": "honey" },
+        { "name": "오레오", "image": "oreo" },
+        { "name": "고구마", "image": "sweetpotato" }
+      ]
+    },
+    {
+      "name": "티",
+      "ingredients": [
+        { "name": "블랙티", "image": "blacktea" },
+        { "name": "캐모마일", "image": "chamomile" },
+        { "name": "얼그레이", "image": "earlgrey" },
+        { "name": "그린티", "image": "greentea" }
+      ]
+    },
+    {
+      "name": "견과류",
+      "ingredients": [
+        { "name": "아몬드", "image": "almond" },
+        { "name": "피스타치오", "image": "pistachio" },
+        { "name": "토피넛", "image": "toffeenut" },
+        { "name": "호두", "image": "walnut" }
+      ]
+    },
+    {
+      "name": "향신료",
+      "ingredients": [
+        { "name": "시나몬", "image": "cinnamon" },
+        { "name": "생강", "image": "ginger" },
+        { "name": "라벤더", "image": "lavender" },
+        { "name": "민트", "image": "mint" },
+        { "name": "로즈마리", "image": "rosemary" }
+      ]
+    }
+  ],
   "cafe_ingredients": [
     { "name": "아몬드", "image": "almond" },
     { "name": "사과", "image": "apple" },
     { "name": "바나나", "image": "banana" },
+    { "name": "블랙티", "image": "blacktea" },
     { "name": "블루베리", "image": "blueberries" },
-    {
-      "name": "카라멜 시럽",
-      "image": "caramelsyrup"
-    },
+    { "name": "카라멜 시럽", "image": "caramelsyrup" },
     { "name": "캐모마일", "image": "chamomile" },
+    { "name": "체리", "image": "cherry" },
+    { "name": "치즈케이크", "image": "cheesecake" },
     { "name": "치즈케이크 시럽", "image": "cheesecakesyrup" },
-    {
-      "name": "초콜릿",
-      "image": "chocolate"
-    },
+    { "name": "초콜릿", "image": "chocolate" },
     { "name": "시나몬", "image": "cinnamon" },
     { "name": "코코넛", "image": "coconut" },
-    {
-      "name": "다크 초콜릿",
-      "image": "darkchocolate"
-    },
+    { "name": "커피", "image": "coffee" },
+    { "name": "쿠키앤크림", "image": "cookieandcream" },
+    { "name": "다크 초콜릿", "image": "darkchocolate" },
     { "name": "얼그레이", "image": "earlgrey" },
     { "name": "에스프레소", "image": "espresso" },
     { "name": "플로럴 시럽", "image": "flowersyrup" },
     { "name": "생강", "image": "ginger" },
     { "name": "자몽", "image": "grapefruit" },
+    { "name": "청포도", "image": "greengrapes" },
     { "name": "녹차", "image": "greentea" },
     { "name": "헤이즐넛 시럽", "image": "hazelnutsyrup" },
     { "name": "꿀", "image": "honey" },
@@ -32,22 +124,29 @@
     { "name": "키위", "image": "kiwi" },
     { "name": "라벤더", "image": "lavender" },
     { "name": "레몬", "image": "lemon" },
+    { "name": "라임", "image": "lime" },
     { "name": "망고", "image": "mango" },
     { "name": "마스카포네치즈", "image": "mascarponecheese" },
     { "name": "우유", "image": "milk" },
     { "name": "민트", "image": "mint" },
+    { "name": "오레오", "image": "oreo" },
     { "name": "오렌지", "image": "orange" },
     { "name": "복숭아", "image": "peach" },
     { "name": "파인애플", "image": "pineapple" },
     { "name": "피스타치오", "image": "pistachio" },
-    { "name": "라즈베리", "image": "raspberry" },
+    { "name": "라즈베리", "image": "raspberries" },
     { "name": "로즈마리", "image": "rosemary" },
     { "name": "탄산수", "image": "sparklingwater" },
     { "name": "딸기", "image": "strawberry" },
+    { "name": "고구마", "image": "sweetpotato" },
+    { "name": "시럽", "image": "syrup" },
     { "name": "토피넛", "image": "toffeenut" },
     { "name": "바닐라 시럽", "image": "vanillasyrup" },
     { "name": "호두", "image": "walnut" },
+    { "name": "수박", "image": "watermelon" },
     { "name": "물", "image": "water" },
-    { "name": "요거트", "image": "yogurt" }
+    { "name": "휘핑크림", "image": "whippedcream" },
+    { "name": "요거트", "image": "yogurt" },
+    { "name": "유자", "image": "yuzu" }
   ]
 }
